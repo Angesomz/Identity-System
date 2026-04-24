@@ -1,0 +1,25 @@
+security_policies:
+  mtls:
+    enabled: true
+    ca_cert_path: "/etc/certs/ca.crt"
+    server_cert_path: "/etc/certs/server.crt"
+    server_key_path: "/etc/certs/server.key"
+    
+  jwt:
+    issuer: "insa-auth-service"
+    audience: "insa-internal"
+    
+  encryption:
+    algorithm: "AES-256-GCM"
+    key_rotation_days: 90
+    
+  rate_limiting:
+    default_limit: "100/minute"
+    burst_limit: "150/minute"
+    
+  audit:
+    log_retention_days: 365
+    sensitive_fields_masking:
+      - "password"
+      - "national_id"
+      - "embedding_vector"

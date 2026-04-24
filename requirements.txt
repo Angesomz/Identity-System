@@ -1,0 +1,24 @@
+fastapi>=0.100.0
+uvicorn[standard]>=0.23.0
+sqlalchemy>=2.0.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+redis>=5.0.0
+python-multipart>=0.0.6
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+numpy>=1.24.0
+# faiss-cpu or faiss-gpu depending on hardware
+faiss-cpu>=1.7.4 
+# opencv-python-headless for server environments
+opencv-python-headless>=4.8.0 
+insightface>=0.7.3
+onnxruntime>=1.15.0 
+httpx>=0.24.1
+pytest>=7.4.0
+requests>=2.31.0
+pyjwt>=2.8.0
+# OCR dependencies
+easyocr>=1.7.0
+Pillow>=10.0.0
+google-generativeai>=0.7.0

@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  gateway:
+    build:
+      context: ../../
+      dockerfile: deployment/docker/api.Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/insa_db
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+    # ─── FAISS persistence ────────────────────────────────────────────
+    # Mount the host ./faiss_data directory so FAISS shard indices
+    # (shard_0.faiss, shard_1.faiss, shard_2.faiss + _meta.json files)
+    # survive container restarts and re-deployments.
+    volumes:
+      - faiss_data:/app/vector_cluster
+    networks:
+      - insa-network
+
+  face-processing:
+    build:
+      context: ../../
+      dockerfile: deployment/docker/processing.Dockerfile
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+    networks:
+      - insa-network
+
+  embedding:
+    build:
+      context: ../../
+      dockerfile: deployment/docker/embedding.Dockerfile
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [ gpu ]
+    networks:
+      - insa-network
+
+  vector-cluster:
+    build:
+      context: ../../
+      dockerfile: deployment/docker/vector.Dockerfile
+    ports:
+      - "50051:50051"
+    # ─── FAISS persistence (same volume as gateway) ───────────────────
+    volumes:
+      - faiss_data:/app/vector_cluster
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [ gpu ]
+    networks:
+      - insa-network
+
+  db:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: insa_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - insa-network
+
+  redis:
+    image: redis:6-alpine
+    networks:
+      - insa-network
+
+networks:
+  insa-network:
+    driver: bridge
+
+volumes:
+  postgres_data: # Named volume for FAISS shard files — persists across container restarts
+
+  faiss_data:

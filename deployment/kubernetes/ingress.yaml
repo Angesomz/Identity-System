@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: insa-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+spec:
+  tls:
+  - hosts:
+    - identity.insa.gov.et
+    secretName: insa-tls-cert
+  rules:
+  - host: identity.insa.gov.et
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: insa-gateway-svc
+            port:
+              number: 80

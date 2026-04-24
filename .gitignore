@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+.env
+vector_cluster/*.faiss
+vector_cluster/*.json
+frontend/node_modules/
+frontend/dist/

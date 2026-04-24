@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: insa-gateway
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: insa-gateway
+  template:
+    metadata:
+      labels:
+        app: insa-gateway
+    spec:
+      containers:
+      - name: gateway
+        image: insa-gateway:latest
+        ports:
+        - containerPort: 8000
+        envFrom:
+        - secretRef:
+            name: insa-secrets
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: insa-gateway-svc
+spec:
+  selector:
+    app: insa-gateway
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
